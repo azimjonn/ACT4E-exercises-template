@@ -33,16 +33,15 @@ class MyFiniteSetProduct(I.FiniteSetProduct[C, List[C]]):
         result = [[]]
 
         for comp in self._components:
-            itr = comp.elements()
             temp_result = []
 
             for item in result:
-                for elem in itr:
+                for elem in comp.elements():
                     temp_result.append(item + [elem])
             result = temp_result
         
         for product in result:
-            yield result
+            yield product
     
     def pack(self, args: Sequence[C]) -> List[C]:
         return list(args)

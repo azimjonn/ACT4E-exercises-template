@@ -3,18 +3,24 @@ from typing import Any
 import act4e_interfaces as I
 
 from .my_finite_sets import MyFiniteSet
+from .my_finite_set_product import MyFiniteSetProduct
 
 class MyFiniteSetRepresentation(I.FiniteSetRepresentation):
     def load(self, h: I.IOHelper, data: I.FiniteSet_desc) -> I.FiniteSet[Any]:
         if not isinstance(data, dict):
             raise I.InvalidFormat()
-        if not "elements" in data:
+        if "elements" in data:
+            if not isinstance(data["elements"], list):
+                raise I.InvalidFormat()
+            elements = data["elements"]
+            return MyFiniteSet(elements)
+        elif "product" in data:
+            if not isinstance(data["product"], list):
+                raise I.InvalidFormat()
+            components = [self.load(h, comp) for comp in data["product"]]
+            return MyFiniteSetProduct(components)
+        else:
             raise I.InvalidFormat()
-        if not isinstance(data["elements"], list):
-            raise I.InvalidFormat()
-        
-        elements = data["elements"]
-        return MyFiniteSet(elements)
 
     def save(self, h: I.IOHelper, f: I.FiniteSet[Any]) -> I.FiniteSet_desc:
         all_elements = [f.save(h, elem) for elem in f.elements()]
