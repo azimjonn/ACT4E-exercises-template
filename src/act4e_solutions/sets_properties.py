@@ -7,7 +7,11 @@ X = TypeVar("X")
 
 class SolFiniteSetProperties(I.FiniteSetProperties):
     def is_subset(self, a: I.FiniteSet[X], b: I.FiniteSet[X]) -> bool:
-        raise NotImplementedError()
+        for elem in a.elements():
+            if not b.contains(elem):
+                return False
+        
+        return True
 
 
 class SolFiniteMakeSetUnion(I.FiniteMakeSetUnion):
