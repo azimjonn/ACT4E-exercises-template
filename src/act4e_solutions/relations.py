@@ -3,6 +3,8 @@ from typing import Any, TypeVar
 import act4e_interfaces as I
 from act4e_interfaces import FiniteRelation
 
+from .my_finite_relation import MyFiniteRelation
+
 E1 = TypeVar("E1")
 E2 = TypeVar("E2")
 E3 = TypeVar("E3")
@@ -61,4 +63,14 @@ class SolFiniteEndorelationOperations(I.FiniteEndorelationOperations):
 
 class SolFiniteRelationCompose(I.FiniteRelationCompose):
     def compose(self, fr1: FiniteRelation[E1, E2], fr2: FiniteRelation[E2, E3]) -> I.FiniteRelation[E1, E3]:
-        raise NotImplementedError()
+        pairs = []
+        for a in fr1.source().elements():
+            for b in fr1.target().elements():
+                if not fr1.holds(a, b):
+                    continue
+                
+                for c in fr2.target().elements():
+                    if fr2.holds(b, c):
+                        pairs.append((a, c))
+        
+        return MyFiniteRelation(fr1.source(), fr2.target(), pairs)
