@@ -16,24 +16,33 @@ B = TypeVar("B")
 
 class SolFiniteRelationProperties(I.FiniteRelationProperties):
     def is_surjective(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return all(any(fr.holds(a, b) for a in fr.source().elements()) for b in fr.target().elements())
 
     def is_defined_everywhere(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return all(any(fr.holds(a, b) for b in fr.target().elements()) for a in fr.source().elements())
 
     def is_injective(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return not any(sum(fr.holds(a, b) for a in fr.source().elements()) > 1 for b in fr.target().elements())
 
     def is_single_valued(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return not any(sum(fr.holds(a, b) for b in fr.target().elements()) > 1 for a in fr.source().elements())
 
 
 class SolFiniteRelationOperations(I.FiniteRelationOperations):
     def transpose(self, fr: I.FiniteRelation[A, B]) -> I.FiniteRelation[B, A]:
-        raise NotImplementedError()
+        pairs = []
+
+        for a in fr.source().elements():
+            for b in fr.target().elements():
+                if fr.holds(a, b):
+                    pairs.append((b, a))
+        
+        return MyFiniteRelation(fr.target(), fr.source(), pairs)
 
     def as_relation(self, f: I.FiniteMap[A, B]) -> I.FiniteRelation[A, B]:
-        raise NotImplementedError()
+        pairs = [(a, f(a)) for a in f.source().elements()]
+
+        return MyFiniteRelation(f.source(), f.target(), pairs)
 
 
 class SolFiniteEndorelationProperties(I.FiniteEndorelationProperties):
