@@ -47,22 +47,45 @@ class SolFiniteRelationOperations(I.FiniteRelationOperations):
 
 class SolFiniteEndorelationProperties(I.FiniteEndorelationProperties):
     def is_reflexive(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return all(fr.holds(a, a) for a in fr.source().elements())
 
     def is_irreflexive(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        return not any(fr.holds(a, a) for a in fr.source().elements())
 
     def is_transitive(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        for a in fr.source().elements():
+            for b in fr.source().elements():
+                for c in fr.source().elements():
+                    if fr.holds(a, b) and fr.holds(b, c):
+                        if not fr.holds(a, c):
+                            return False
+
+        return True
 
     def is_symmetric(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        for a in fr.source().elements():
+            for b in fr.source().elements():
+                if fr.holds(a, b):
+                    if not fr.holds(b, a):
+                        return False
+        
+        return True
 
     def is_antisymmetric(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        for a in fr.source().elements():
+            for b in fr.source().elements():
+                if fr.holds(a, b) and fr.holds(b, a):
+                    return a == b
+        return False
 
     def is_asymmetric(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        raise NotImplementedError()
+        for a in fr.source().elements():
+            for b in fr.source().elements():
+                if fr.holds(a, b):
+                    if fr.holds(b, a):
+                        return False
+        
+        return True
 
 
 class SolFiniteEndorelationOperations(I.FiniteEndorelationOperations):
