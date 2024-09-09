@@ -1,3 +1,4 @@
+from queue import Queue
 from typing import Any, TypeVar
 
 import act4e_interfaces as I
@@ -90,8 +91,23 @@ class SolFiniteEndorelationProperties(I.FiniteEndorelationProperties):
 
 class SolFiniteEndorelationOperations(I.FiniteEndorelationOperations):
     def transitive_closure(self, fr: I.FiniteRelation[E, E]) -> I.FiniteRelation[E, E]:
-        raise NotImplementedError()
+        pairs = []
+        for origin in fr.source().elements():
+            visited = [False] * fr.source().size()
+            q = Queue()
 
+            q.put(origin)
+
+            while not q.empty():
+                hop = q.get()
+
+                for idx, jump in enumerate(fr.source().elements()):
+                    if not visited[idx] and fr.holds(hop, jump):
+                        pairs.append((origin, jump))
+                        visited[idx] = True
+                        q.put(jump)
+        
+        return MyFiniteRelation(fr.source(), fr.source(), pairs)
 
 class SolFiniteRelationCompose(I.FiniteRelationCompose):
     def compose(self, fr1: FiniteRelation[E1, E2], fr2: FiniteRelation[E2, E3]) -> I.FiniteRelation[E1, E3]:
