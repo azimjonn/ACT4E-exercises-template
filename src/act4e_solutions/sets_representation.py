@@ -23,5 +23,11 @@ class MyFiniteSetRepresentation(I.FiniteSetRepresentation):
             raise I.InvalidFormat()
 
     def save(self, h: I.IOHelper, f: I.FiniteSet[Any]) -> I.FiniteSet_desc:
-        all_elements = [f.save(h, elem) for elem in f.elements()]
-        return {"elements": all_elements}
+        if isinstance(f, I.FiniteSetProduct):
+            result = [self.save(h, x) for x in f.components()]
+            return {"product": result}
+        
+        elif isinstance(f, I.FiniteSet):
+            all_elements = [f.save(h, elem) for elem in f.elements()]
+            return {"elements": all_elements}
+            
