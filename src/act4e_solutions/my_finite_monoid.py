@@ -11,7 +11,7 @@ B = TypeVar("B")
 
 class MyFiniteMonoid(I.FiniteMonoid[A], MyFiniteSemigroup[A]):
     _neutral: A
-    def __init__(self, carrier: I.FiniteSet[A], composition, neutral: A):
+    def __init__(self, carrier: I.FiniteSet[A], composition: I.FiniteMap[B, A], neutral: A):
         super().__init__(carrier, composition)
 
         self._neutral = neutral
