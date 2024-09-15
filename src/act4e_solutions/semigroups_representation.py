@@ -4,6 +4,7 @@ import act4e_interfaces as I
 
 from .my_finite_set_product import MyFiniteSetProduct
 from .my_finite_semigroup import MyFiniteSemigroup
+from .my_finite_monoid import MyFiniteMonoid
 
 from .sets_representation import MyFiniteSetRepresentation
 from .maps_representation import SolFiniteMapRepresentation
@@ -44,10 +45,28 @@ class SolFiniteSemigroupRepresentation(I.FiniteSemigroupRepresentation):
 
 class SolFiniteMonoidRepresentation(I.FiniteMonoidRepresentation):
     def load(self, h: I.IOHelper, s: I.FiniteMonoid_desc) -> I.FiniteMonoid[X]:
-        raise NotImplementedError()
+        carrier = MyFiniteSetRepresentation().load(h, s["carrier"])
+        
+        source = MyFiniteSetProduct((carrier, carrier))
+        target = carrier
+        values = s["composition"]
+        map_repr = {
+            "source": MyFiniteSetRepresentation().save(h, source),
+            "target": MyFiniteSetRepresentation().save(h, target),
+            "values": values
+        }
+
+        composition = SolFiniteMapRepresentation().load(h, map_repr)
+
+        neutral = s["neutral"]
+
+        return MyFiniteMonoid(carrier, composition, neutral)
 
     def save(self, h: I.IOHelper, m: I.FiniteMonoid[Any]) -> I.FiniteMonoid_desc:
-        raise NotImplementedError()
+        semigroup = SolFiniteSemigroupRepresentation().save(h, m)
+        semigroup["neutral"] = m.identity()
+
+        return semigroup
 
 
 class SolFiniteGroupRepresentation(I.FiniteGroupRepresentation):
