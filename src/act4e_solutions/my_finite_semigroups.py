@@ -35,3 +35,23 @@ class MyFreeSemigroup(I.FreeSemigroup[A, List[A]]):
 
     def unit(self, a: A) -> List[A]:
         return [a]
+
+class MyFiniteMonoid(I.FiniteMonoid[A], MyFiniteSemigroup[A]):
+    _neutral: A
+    def __init__(self, carrier: I.FiniteSet[A], composition: I.FiniteMap[B, A], neutral: A):
+        super().__init__(carrier, composition)
+
+        self._neutral = neutral
+
+    def identity(self) -> A:
+        return self._neutral
+
+class MyFiniteGroup(I.FiniteGroup[A], MyFiniteMonoid[A]):
+    _inverse: MyFiniteMap[Tuple[A, A], A]
+    def __init__(self, carrier: I.FiniteSet[A], composition: I.FiniteMap[B, A], neutral: A, inverse: I.FiniteMap[A, A]):
+        super().__init__(carrier, composition, neutral)
+        
+        self._inverse = inverse
+    
+    def inverse(self, e: A) -> A:
+        return self._inverse(e)

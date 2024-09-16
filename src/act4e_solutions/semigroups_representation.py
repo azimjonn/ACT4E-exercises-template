@@ -3,9 +3,7 @@ from typing import Any, TypeVar
 import act4e_interfaces as I
 
 from .my_finite_set_product import MyFiniteSetProduct
-from .my_finite_semigroup import MyFiniteSemigroup
-from .my_finite_monoid import MyFiniteMonoid
-from .my_finite_group import MyFiniteGroup
+from .my_finite_semigroups import MyFiniteSemigroup, MyFiniteMonoid, MyFiniteGroup
 
 from .sets_representation import MyFiniteSetRepresentation
 from .maps_representation import SolFiniteMapRepresentation
