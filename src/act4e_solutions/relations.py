@@ -20,7 +20,8 @@ class SolFiniteRelationProperties(I.FiniteRelationProperties):
         return all(any(fr.holds(a, b) for a in fr.source().elements()) for b in fr.target().elements())
 
     def is_defined_everywhere(self, fr: I.FiniteRelation[Any, Any]) -> bool:
-        return all(any(fr.holds(a, b) for b in fr.target().elements()) for a in fr.source().elements())
+        # return all(any(fr.holds(a, b) for b in fr.target().elements()) for a in fr.source().elements())
+        return self.is_surjective(SolFiniteRelationOperations().transpose(fr))
 
     def is_injective(self, fr: I.FiniteRelation[Any, Any]) -> bool:
         return not any(sum(fr.holds(a, b) for a in fr.source().elements()) > 1 for b in fr.target().elements())
@@ -37,6 +38,9 @@ class SolFiniteRelationOperations(I.FiniteRelationOperations):
             for b in fr.target().elements():
                 if fr.holds(a, b):
                     pairs.append((b, a))
+        
+        # for a, b in fr._pairs:
+        #     pairs.append((b, a))
         
         return MyFiniteRelation(fr.target(), fr.source(), pairs)
 
@@ -90,13 +94,16 @@ class SolFiniteEndorelationProperties(I.FiniteEndorelationProperties):
 
 
 class SolFiniteEndorelationOperations(I.FiniteEndorelationOperations):
-    def transitive_closure(self, fr: I.FiniteRelation[E, E]) -> I.FiniteRelation[E, E]:
+    def transitive_closure(self, fr: I.FiniteRelation[E, E], fill_reflex=False) -> I.FiniteRelation[E, E]:
         pairs = []
         for origin in fr.source().elements():
             visited = [False] * fr.source().size()
             q = Queue()
 
             q.put(origin)
+
+            if fill_reflex:
+                pairs.append((origin, origin))
 
             while not q.empty():
                 hop = q.get()
@@ -112,6 +119,7 @@ class SolFiniteEndorelationOperations(I.FiniteEndorelationOperations):
 class SolFiniteRelationCompose(I.FiniteRelationCompose):
     def compose(self, fr1: FiniteRelation[E1, E2], fr2: FiniteRelation[E2, E3]) -> I.FiniteRelation[E1, E3]:
         pairs = []
+        # fr1.image(a) -> List[B]
         for a in fr1.source().elements():
             for b in fr1.target().elements():
                 if not fr1.holds(a, b):
