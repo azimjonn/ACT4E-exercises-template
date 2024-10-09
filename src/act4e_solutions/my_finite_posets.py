@@ -5,6 +5,7 @@ from .my_finite_sets import MyFiniteSet
 from .sets_properties import SolFiniteSetProperties
 from .sets_power import SolFiniteMakePowerSet
 from .my_finite_set_product import MyFiniteSetProduct
+from .my_finite_set_disjoint_union import MyFiniteSetDisjointUnion
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -56,3 +57,25 @@ class MyFinitePosetProduct(I.FinitePosetProduct[C, List[C]]):
                 return False
         
         return True
+
+class MyFinitePosetDisjointUnion(I.FinitePosetDisjointUnion[C, Tuple[int, C]]):
+    _components: List[I.FinitePoset[C]]
+    _carrier: I.FiniteSetDisjointUnion[C, Tuple[int, C]]
+
+    def __init__(self, ps: Collection[I.FinitePoset[C]]):
+        self._components = list(ps)
+
+        fs = [c.carrier() for c in self._components]
+        self._carrier = MyFiniteSetDisjointUnion(fs)
+    
+    def components(self) -> Sequence[I.FinitePoset[C]]:
+        return self._components
+    
+    def carrier(self) -> I.FiniteSetDisjointUnion[C, Tuple[int | C]]:
+        return self._carrier
+    
+    def holds(self, a: Tuple[int, C], b: Tuple[int, C]) -> bool:
+        if a[0] != b[0]:
+            return False
+        
+        return self._components[a[0] - 1].holds(a[1], b[1])
