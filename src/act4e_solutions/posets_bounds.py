@@ -2,7 +2,7 @@ from typing import Any, List, Optional, overload, TypeVar, Collection
 
 import act4e_interfaces as I
 
-from queue import Queue
+import copy
 
 E = TypeVar("E")
 X = TypeVar("X")
@@ -40,7 +40,10 @@ class SolFinitePosetMeasurement(I.FinitePosetMeasurement):
 
 class SolFinitePosetConstructionOpposite(I.FinitePosetConstructionOpposite):
     def opposite(self, p: I.FinitePoset[X]) -> I.FinitePoset[X]:
-        raise NotImplementedError() # implement here
+        op = copy.deepcopy(p)
+        op.holds = lambda x, y: p.holds(y, x)
+
+        return op
 
 
 class SolFinitePosetSubsetProperties(I.FinitePosetSubsetProperties):
