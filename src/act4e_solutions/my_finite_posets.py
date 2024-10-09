@@ -4,9 +4,11 @@ import act4e_interfaces as I
 from .my_finite_sets import MyFiniteSet
 from .sets_properties import SolFiniteSetProperties
 from .sets_power import SolFiniteMakePowerSet
+from .my_finite_set_product import MyFiniteSetProduct
 
 A = TypeVar("A")
 B = TypeVar("B")
+C = TypeVar("C")
 
 class MyFinitePoset(I.FinitePoset[A]):
     _carrier: I.FiniteSet[A]
@@ -32,3 +34,25 @@ class MyFinitePosetOfFiniteSubsets(I.FinitePosetOfFiniteSubsets[A, I.FiniteSet[A
     
     def holds(self, a: I.FiniteSet[A], b: I.FiniteSet[A]) -> bool:
         return SolFiniteSetProperties().is_subset(a, b)
+
+class MyFinitePosetProduct(I.FinitePosetProduct[C, List[C]]):
+    _components: List[I.FinitePoset[C]]
+    _carrier: I.FiniteSetProduct[C, List[C]]
+    def __init__(self, ps: Sequence[I.FinitePoset[C]]) -> None:
+        self._components = ps
+
+        fs = [c.carrier() for c in ps]
+        self._carrier = MyFiniteSetProduct(fs)
+    
+    def carrier(self) -> I.FiniteSetProduct[C, List[C]]:
+        return self._carrier
+
+    def components(self) -> Sequence[I.FinitePoset[C]]:
+        return self._components
+    
+    def holds(self, a: List[C], b: List[C]) -> bool:
+        for ai, bi, poset in zip(a, b, self._components):
+            if not poset.holds(ai, bi):
+                return False
+        
+        return True

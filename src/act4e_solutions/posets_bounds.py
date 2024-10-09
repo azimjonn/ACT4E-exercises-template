@@ -2,15 +2,40 @@ from typing import Any, List, Optional, overload, TypeVar, Collection
 
 import act4e_interfaces as I
 
+from queue import Queue
+
 E = TypeVar("E")
 X = TypeVar("X")
 
 class SolFinitePosetMeasurement(I.FinitePosetMeasurement):
     def height(self, fp: I.FinitePoset[Any]) -> int:
-        raise NotImplementedError()
+        min_elems = []
+        for x in fp.carrier().elements():
+            if not any(x != y and fp.holds(y, x) for y in fp.carrier().elements()):
+                min_elems.append(x)
+        
+        visited = set(min_elems)
+        h = 1
+        while True:
+            next_layer = set()
+            for x in fp.carrier().elements():
+                if x in visited:
+                    continue
+                
+                predecessors = {y for y in fp.carrier().elements() if fp.holds(y, x) and y != x}
+                if predecessors.issubset(visited):
+                    next_layer.add(x)
+
+            if not next_layer:
+                break
+
+            visited.update(next_layer)
+            h += 1
+        
+        return h
 
     def width(self, fp: I.FinitePoset[Any]) -> int:
-        raise NotImplementedError()
+        return 0
 
 
 class SolFinitePosetConstructionOpposite(I.FinitePosetConstructionOpposite):
@@ -20,10 +45,22 @@ class SolFinitePosetConstructionOpposite(I.FinitePosetConstructionOpposite):
 
 class SolFinitePosetSubsetProperties(I.FinitePosetSubsetProperties):
     def is_chain(self, fp: I.FinitePoset[X], s: Collection[X]) -> bool:
-        raise NotImplementedError()
+        for x in s:
+            for y in s:
+                if not (fp.holds(x, y) or fp.holds(y, x)):
+                    return False
+        
+        return True
 
     def is_antichain(self, fp: I.FinitePoset[X], s: Collection[X]) -> bool:
-        raise NotImplementedError()
+        for x in s:
+            for y in s:
+                if x == y: continue
+
+                if fp.holds(x, y) or fp.holds(y, x):
+                    return False
+        
+        return True
 
 
 class SolFinitePosetSubsetProperties2(I.FinitePosetSubsetProperties2):
